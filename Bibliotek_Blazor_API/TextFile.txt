@@ -1,0 +1,42 @@
+﻿USE [BiblotekDatabase]
+GO
+SET IDENTITY_INSERT [dbo].[Libraries] ON 
+GO
+INSERT [dbo].[Libraries] ([Id], [Name], [City]) VALUES (1, N'kongens bibliotek', N'Kbh')
+GO
+INSERT [dbo].[Libraries] ([Id], [Name], [City]) VALUES (2, N'Vejle bibliotek', N'vejle')
+GO
+INSERT [dbo].[Libraries] ([Id], [Name], [City]) VALUES (3, N'Odenense bibliotek', N'Odenense')
+GO
+SET IDENTITY_INSERT [dbo].[Libraries] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Books] ON 
+GO
+INSERT [dbo].[Books] ([Id], [Name], [Genre], [FK_LibraryId]) VALUES (2, N'LærDinKvindeTricks', N'krimi', 1)
+GO
+INSERT [dbo].[Books] ([Id], [Name], [Genre], [FK_LibraryId]) VALUES (3, N'HowToEatLikeAMan', N'Romantik', 2)
+GO
+INSERT [dbo].[Books] ([Id], [Name], [Genre], [FK_LibraryId]) VALUES (4, N'LærAtTælle', N'lærebog', 3)
+GO
+INSERT [dbo].[Books] ([Id], [Name], [Genre], [FK_LibraryId]) VALUES (5, N'jumpyjump', N'lærebog', 2)
+GO
+INSERT [dbo].[Books] ([Id], [Name], [Genre], [FK_LibraryId]) VALUES (6, N'Gorden ramsey', N'kogebog', 1)
+GO
+INSERT [dbo].[Books] ([Id], [Name], [Genre], [FK_LibraryId]) VALUES (7, N'Jamie Oliver', N'kogebog', 1)
+GO
+INSERT [dbo].[Books] ([Id], [Name], [Genre], [FK_LibraryId]) VALUES (8, N'It', N'Gyser', 1)
+GO
+INSERT [dbo].[Books] ([Id], [Name], [Genre], [FK_LibraryId]) VALUES (9, N'itcomes', N'gyser', 1)
+GO
+SET IDENTITY_INSERT [dbo].[Books] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Users] ON 
+GO
+INSERT [dbo].[Users] ([Id], [Username], [Password]) VALUES (1, N'Christian', N'1234')
+GO
+INSERT [dbo].[Users] ([Id], [Username], [Password]) VALUES (2, N'Yusuf', N'1234')
+GO
+INSERT [dbo].[Users] ([Id], [Username], [Password]) VALUES (3, N'Thomas', N'1234')
+GO
+SET IDENTITY_INSERT [dbo].[Users] OFF
+GO

@@ -1,0 +1,34 @@
+﻿@inject NavigationManager NavigationManager
+@inject ILocalStorageService localstorage
+
+<AuthorizeView>
+    <NotAuthorized>
+        <button @onclick="Login" class="btn btn-primary">Login</button>
+    </NotAuthorized>
+</AuthorizeView>
+<AuthorizeView>
+<NotAuthorized>
+        <button @onclick="Logout" class="btn btn-danger">logout</button>
+        </NotAuthorized>
+  </AuthorizeView>
+
+@code
+{
+    public HttpClient http { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        http = new HttpClient { BaseAddress = new Uri("https://localhost:7134") };
+    }
+
+    void Login()
+    {
+        NavigationManager.NavigateTo("login");
+    }
+
+    async Task Logout()
+    {
+        await localstorage.RemoveItemAsync("userToken");
+        //var response = await http.GetStringAsync($"/api/login/logout");
+    }
+}

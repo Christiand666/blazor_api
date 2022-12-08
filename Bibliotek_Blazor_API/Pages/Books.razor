@@ -1,0 +1,138 @@
+﻿@page "/Books"
+
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService localstorage
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavManager
+
+
+<EditForm Model="book" OnValidSubmit="GetBookList">
+    <InputSelect id="Genre" @bind-Value="book.Genre">
+        <option>Vælg en genre</option>
+        @foreach (var bookGenre in bookGenres)
+        {
+            <option value="@bookGenre">@bookGenre</option>
+        }
+    </InputSelect>
+
+    <button type="submit" class="btn btn-primary" disabled="@(string.IsNullOrEmpty(book.Genre))">Søg efter bøger</button>
+</EditForm>
+<br />
+<hr />
+@if (booklist != null)
+{
+    <ul>
+        @foreach (var item in booklist)
+        {
+            <li>
+                @item.Name <br />
+                <i class="alert-warning">Hvor mange dage vil du booke bogen:</i>
+                <EditForm Model="bookingPeriod">
+                    <InputSelect id="BookingPeriod" @bind-Value="bookingPeriod">
+                        <option value="1">1</option>
+                        <option value="1">2</option>
+                        <option value="1">3</option>
+                        <option value="1">4</option>
+                        <option value="1">5</option>
+                        <option value="1">6</option>
+                        <option value="7">7</option>
+                    </InputSelect>
+                    <br />
+
+                    @if (item.IsBooked)
+                    {
+                        <button type="submit" class="alert alert-danger" disabled>Bogen er allerede booket</button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="alert alert-success" @onclick="() => BookBook(item.Id)">Book bogen</button>
+                    }
+                </EditForm>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private Models.Book book = new Models.Book();
+    private Models.UserToken token = new Models.UserToken();
+    public HttpClient http { get; set; }
+    private List<Models.Book>? booklist = new List<Models.Book>();
+    private bool bookingResponse = false;
+    private int bookingPeriod = 1;
+
+    private List<string> bookGenres = new List<string>
+    {
+        "Krimi",
+        "Lærebog",
+        "Kogebog",
+        "Romantik",
+        "Gyser"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        http = new HttpClient { BaseAddress = new Uri("https://localhost:7134") };
+    }
+
+    private async Task GetBookList()
+    {
+
+        var token = await GetUserTokenFromLocalstorage();
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            booklist = await http.GetFromJsonAsync<List<Models.Book>>($"/api/books/bookGenreSearch?genre={book.Genre}&userToken={token}");
+        }
+        else
+        {
+            await ConfirmPopup();
+        }
+    }
+
+    private async Task BookBook(int bookId)
+    {
+        var token = await GetUserTokenFromLocalstorage();
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            try
+            {
+                bookingResponse = await http.GetFromJsonAsync<bool>($"/api/books/bookbook?bookId={bookId}&bookingPeriod={bookingPeriod}&userToken={token}");
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            if (bookingResponse)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Bogen er nu reserveret");
+                var updatedBook = booklist.FirstOrDefault(b => b.Id == bookId);
+                updatedBook.IsBooked = true;
+            }
+            else
+                await JsRuntime.InvokeVoidAsync("alert", "Noget gik galt");
+        }
+        else
+        {
+            await ConfirmPopup();
+        }
+
+    }
+
+    private async Task<string> GetUserTokenFromLocalstorage()
+    {
+        var token = await localstorage.GetItemAsync<string>("userToken");
+
+        return token;
+    }
+
+    private async Task ConfirmPopup()
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Du skal logge ind!"); // Confirm
+        if (confirmed)
+            NavManager.NavigateTo("/login");
+    }
+}
